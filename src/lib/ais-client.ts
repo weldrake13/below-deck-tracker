@@ -29,12 +29,50 @@ interface AisEnvelope {
 let backoffMs = 1000;
 const MAX_BACKOFF_MS = 30_000;
 
+export type AisConnectionState = "disabled" | "connecting" | "connected" | "reconnecting";
+
+export interface AisStatus {
+  connectionState: AisConnectionState;
+  /** Why tracking never started, when connectionState is "disabled". */
+  disabledReason: string | null;
+  trackedMmsiCount: number;
+  connectedAt: string | null;
+  reconnectAttempts: number;
+  lastCloseCode: number | null;
+  lastError: string | null;
+  lastErrorAt: string | null;
+  /** Total AIS frames received since this process started — near-zero after
+   *  a while means the socket itself isn't hearing anything, which points at
+   *  the subscription (wrong key, or aisstream-side issue) rather than the
+   *  tracked vessels just being out of coverage. */
+  messagesReceived: number;
+}
+
+const status: AisStatus = {
+  connectionState: "disabled",
+  disabledReason: "not started yet",
+  trackedMmsiCount: 0,
+  connectedAt: null,
+  reconnectAttempts: 0,
+  lastCloseCode: null,
+  lastError: null,
+  lastErrorAt: null,
+  messagesReceived: 0,
+};
+
+/** A snapshot of the live feed's own health — see GET /api/debug. */
+export function getAisStatus(): AisStatus {
+  return { ...status };
+}
+
 function connect(mmsiList: number[]): void {
   const ws = new WebSocket(STREAM_URL);
 
   ws.on("open", () => {
     console.log(`[ais] connected — tracking ${mmsiList.length} vessel(s)`);
     backoffMs = 1000;
+    status.connectionState = "connected";
+    status.connectedAt = new Date().toISOString();
     ws.send(
       JSON.stringify({
         APIKey: config.aisstream.apiKey,
@@ -49,6 +87,8 @@ function connect(mmsiList: number[]): void {
   });
 
   ws.on("message", (data) => {
+    status.messagesReceived += 1;
+
     let envelope: AisEnvelope;
     try {
       envelope = JSON.parse(data.toString());
@@ -77,16 +117,21 @@ function connect(mmsiList: number[]): void {
 
   ws.on("close", (code) => {
     console.log(`[ais] disconnected (code ${code}), reconnecting in ${backoffMs / 1000}s`);
+    status.connectionState = "reconnecting";
+    status.lastCloseCode = code;
     scheduleReconnect(mmsiList);
   });
 
   ws.on("error", (error) => {
     console.error("[ais] connection error:", error.message);
+    status.lastError = error.message;
+    status.lastErrorAt = new Date().toISOString();
     ws.close();
   });
 }
 
 function scheduleReconnect(mmsiList: number[]): void {
+  status.reconnectAttempts += 1;
   setTimeout(() => connect(mmsiList), backoffMs);
   backoffMs = Math.min(backoffMs * 2, MAX_BACKOFF_MS);
 }
@@ -99,14 +144,19 @@ function scheduleReconnect(mmsiList: number[]): void {
 export async function startAisTracking(): Promise<void> {
   if (config.aisstream.apiKey === "") {
     console.log("[ais] AISSTREAM_API_KEY not set — live tracking disabled");
+    status.disabledReason = "AISSTREAM_API_KEY not set";
     return;
   }
 
   const mmsiList = await getTrackedMmsiList();
   if (mmsiList.length === 0) {
     console.log("[ais] no yachts have a known MMSI yet — nothing to track");
+    status.disabledReason = "no yachts have a known MMSI yet";
     return;
   }
 
+  status.trackedMmsiCount = mmsiList.length;
+  status.disabledReason = null;
+  status.connectionState = "connecting";
   connect(mmsiList);
 }

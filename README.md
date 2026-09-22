@@ -160,6 +160,17 @@ matched back to a real, AIS-broadcasting vessel. Those show up in the list with
 "not currently tracked" instead of a guess. See
 [`content/README.md`](content/README.md) if you find one.
 
+**Debugging "why isn't yacht X showing up".** Open `/api/debug` in a browser — it's plain
+JSON, no login needed, nothing secret in it (the API key itself is never included). It
+shows the AIS connection's own state (connected/reconnecting, last error, how many raw
+messages have come in at all), whether the position snapshot restored on startup, and,
+per MMSI, whether it's currently reporting or not. If `ais.connectionState` is
+`"connected"` and `messagesReceived` is climbing but a specific MMSI is still in
+`notReporting`, that vessel just isn't within range of one of aisstream.io's (terrestrial,
+not satellite) receivers right now, or its transponder is off — not a bug. If
+`messagesReceived` stays near zero, that points at the subscription itself (wrong/expired
+key) rather than vessel coverage.
+
 **Surviving a restart.** The position store also matters for a second reason: the
 aisstream.io connection is a live stream, not something you can poll on demand, so every
 browser tab shares that one connection instead of opening its own — no way to hit a rate

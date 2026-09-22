@@ -1,4 +1,4 @@
-import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rename, stat, writeFile } from "node:fs/promises";
 import { CACHE_DIR, POSITIONS_SNAPSHOT_FILE } from "./paths.js";
 import { getPositions, loadPositions } from "./position-store.js";
 
@@ -34,6 +34,20 @@ export async function savePositionSnapshot(): Promise<void> {
   const tmpFile = `${POSITIONS_SNAPSHOT_FILE}.tmp`;
   await writeFile(tmpFile, JSON.stringify(getPositions()));
   await rename(tmpFile, POSITIONS_SNAPSHOT_FILE); // atomic — never leaves a half-written file behind
+}
+
+/** For GET /api/debug — whether the snapshot file exists and how old it is. */
+export async function getSnapshotStatus(): Promise<{
+  path: string;
+  existsOnDisk: boolean;
+  savedAt: string | null;
+}> {
+  try {
+    const info = await stat(POSITIONS_SNAPSHOT_FILE);
+    return { path: POSITIONS_SNAPSHOT_FILE, existsOnDisk: true, savedAt: info.mtime.toISOString() };
+  } catch {
+    return { path: POSITIONS_SNAPSHOT_FILE, existsOnDisk: false, savedAt: null };
+  }
 }
 
 /** Starts periodic saving. Returns a stopper to call during shutdown. */
