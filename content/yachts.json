@@ -8,10 +8,10 @@
     "vesselType": "motor yacht",
     "lengthFt": 164,
     "builder": "Benetti (Italy)",
-    "mmsi": null,
-    "imo": null,
+    "mmsi": 215725000,
+    "imo": 9028225,
     "homeWaters": "Mediterranean (current charter base, Malta-flagged); filmed in the Caribbean (St. Maarten) for the show",
-    "notes": "Renamed repeatedly: launched as Sotavento, then Lumiere, then Cuor di Leone (the name at time of S1 filming, used as show name \"Honor\"), then Lionheart, now Barents. No confirmed MMSI/IMO found for the current identity (Barents) — left null rather than guessing."
+    "notes": "Renamed repeatedly: launched as Sotavento, then Lumiere, then Cuor di Leone (the name at time of S1 filming, used as show name \"Honor\"), then Lionheart, now Barents. MMSI/IMO confirmed via MarineTraffic for the current identity (Barents, 164ft Benetti — matches builder/length on file)."
   },
   {
     "id": "below-deck-s2-ohana",
@@ -22,10 +22,10 @@
     "vesselType": "motor yacht",
     "lengthFt": 154,
     "builder": "Admiral Marine Works (US)",
-    "mmsi": null,
-    "imo": null,
-    "homeWaters": "Caribbean & Bahamas; later chartered out of New England (US East Coast) after a refit",
-    "notes": "Launched 1998 as Roxana, was named Ohana by S2 filming — no fictional alias was used. Sold after filming and renamed Rhino (~2015), then refit and renamed again to Star Diamond (current name). AIS lookups for \"Ohana\"/\"Rhino\" returned multiple unrelated vessels sharing those generic names — left MMSI/IMO null rather than guessing."
+    "mmsi": 339002000,
+    "imo": 9093816,
+    "homeWaters": "Caribbean & Bahamas; later chartered out of New England (US East Coast) after a refit; currently Jamaica-flagged",
+    "notes": "Launched 1998 as Roxana, was named Ohana by S2 filming — no fictional alias was used. Sold after filming and renamed Rhino (~2015), then refit and renamed again to Star Diamond (current name). AIS lookups for \"Ohana\"/\"Rhino\" returned multiple unrelated vessels sharing those generic names, but \"Star Diamond\" resolved to a single unambiguous 154ft/1998 Admiral-built yacht matching the specs on file — MMSI/IMO confirmed via MarineTraffic."
   },
   {
     "id": "below-deck-s3-eros",
@@ -222,6 +222,20 @@
     "imo": 8349385,
     "homeWaters": "Mediterranean (Croatia)",
     "notes": "Real name unchanged. Length reported inconsistently across press (164ft per registry/AIS vs. ~170ft in one article) — used the registry/AIS figure."
+  },
+  {
+    "id": "below-deck-med-s12-zaliv-iii",
+    "showName": "Zaliv III",
+    "realName": "Zaliv III",
+    "show": "below-deck-med",
+    "seasons": [12],
+    "vesselType": "motor yacht",
+    "lengthFt": 162,
+    "builder": "Mondomarine (Italy)",
+    "mmsi": 256100000,
+    "imo": 9509073,
+    "homeWaters": "Mediterranean (Greece — filming in Corfu/the Ionian Islands)",
+    "notes": "Season 12 (premiering after Sept 2026) was still filming at the time this entry was added — real/show name split, if any, isn't confirmed yet, so realName is set equal to showName by default like other recent seasons. Least certain entry in this file alongside the S13 Azul V entry; re-check once official season press/premiere confirms the yacht."
   },
   {
     "id": "below-deck-sailing-yacht-s1-5-parsifal-iii",
