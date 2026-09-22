@@ -29,6 +29,22 @@ interface AisEnvelope {
 let backoffMs = 1000;
 const MAX_BACKOFF_MS = 30_000;
 
+// aisstream sends time_utc as Go's default time.Time string format, e.g.
+// "2026-09-22 10:57:03.893983009 +0000 UTC" — not ISO 8601. `new Date(...)`
+// happens to parse it in V8 (Node, Chrome), but that's lenient-parser luck,
+// not a guarantee — other engines (e.g. Safari/JavaScriptCore) are stricter
+// and can return Invalid Date. Normalise once here rather than trust every
+// consumer's Date parser to guess right. It's always UTC (the field name
+// says so), so we only need the date/time digits — sub-second precision and
+// the redundant "+0000 UTC" suffix don't matter for an "updated Xm ago" UI.
+const GO_TIMESTAMP = /^(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2}:\d{2})/;
+
+function toIsoTimestamp(raw: string | undefined): string {
+  const match = raw !== undefined ? GO_TIMESTAMP.exec(raw) : null;
+  if (match) return `${match[1]}T${match[2]}Z`;
+  return new Date().toISOString();
+}
+
 export type AisConnectionState = "disabled" | "connecting" | "connected" | "reconnecting";
 
 export interface AisStatus {
@@ -110,7 +126,7 @@ function connect(mmsiList: number[]): void {
       longitude,
       course: report?.Cog ?? null,
       speedKnots: report?.Sog ?? null,
-      receivedAt: envelope.MetaData?.time_utc ?? new Date().toISOString(),
+      receivedAt: toIsoTimestamp(envelope.MetaData?.time_utc),
       broadcastName: envelope.MetaData?.ShipName?.trim() || null,
     });
   });
