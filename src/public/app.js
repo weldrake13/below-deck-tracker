@@ -13,27 +13,59 @@
   const selectedShows = new Set();
   const selectedYachtIds = new Set();
 
-  const map = L.map("map", { worldCopyJump: true }).setView([25, -40], 3);
-  // Default is bottom-right, which on mobile collides with the floating
-  // "show list" button that overlays the bottom of the full-screen map.
-  map.attributionControl.setPosition("bottomleft");
+  // The default attribution control renders as a light, nearly full-width bar
+  // (the required Esri/OSM credit text is long) which, once the map went
+  // full-bleed on mobile, read as a permanent strip across the bottom and
+  // could even sit under the floating "show list" pill. It's replaced below
+  // with a small "ⓘ" toggle that reveals the same required text on tap —
+  // still there, just not permanently on screen.
+  const map = L.map("map", { worldCopyJump: true, attributionControl: false }).setView([25, -40], 3);
 
   // Esri's free Ocean basemap gives an actual nautical-chart look (bathymetry,
   // depth soundings) with no API key. If it's ever unreachable, OpenStreetMap
   // is one click away as a plain fallback.
   const oceanLayer = L.tileLayer(
     "https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}",
-    {
-      attribution: "Esri, GEBCO, NOAA, National Geographic, Garmin, HERE",
-      maxZoom: 13,
-    },
+    { maxZoom: 13 },
   );
   const streetLayer = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     maxZoom: 19,
   });
   oceanLayer.addTo(map);
   L.control.layers({ "Nautical chart": oceanLayer, "Street map": streetLayer }).addTo(map);
+
+  const AttributionToggle = L.Control.extend({
+    options: { position: "bottomleft" },
+    onAdd() {
+      const container = L.DomUtil.create("div", "leaflet-control attribution-toggle");
+      const button = L.DomUtil.create("button", "attribution-toggle__button", container);
+      button.type = "button";
+      button.textContent = "ⓘ";
+      button.setAttribute("aria-label", "Map data attribution");
+      button.setAttribute("aria-expanded", "false");
+      const panel = L.DomUtil.create("div", "attribution-toggle__panel", container);
+      panel.innerHTML =
+        "Esri, GEBCO, NOAA, National Geographic, Garmin, HERE &middot; " +
+        '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors';
+      L.DomEvent.disableClickPropagation(container);
+      button.addEventListener("click", () => {
+        const isOpen = container.classList.toggle("is-open");
+        button.setAttribute("aria-expanded", String(isOpen));
+      });
+      return container;
+    },
+  });
+  new AttributionToggle().addTo(map);
+
+  // Leaflet caches the container size at init; on a flex layout the map's
+  // real size can still be settling then (and changes again whenever the
+  // filters drawer opens/closes), which otherwise leaves a blank strip where
+  // Leaflet thinks the map ends but the div doesn't.
+  if (typeof ResizeObserver !== "undefined") {
+    new ResizeObserver(() => map.invalidateSize()).observe(document.getElementById("map"));
+  } else {
+    window.addEventListener("resize", () => map.invalidateSize());
+  }
 
   const markersByMmsi = new Map();
 

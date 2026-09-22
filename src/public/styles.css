@@ -354,6 +354,44 @@ h1, h2 {
   margin-right: 0.3rem;
 }
 
+/* Collapsed map attribution — a small "ⓘ" that reveals the required credit
+   text on tap instead of a permanent bar across the map. */
+.attribution-toggle {
+  position: relative;
+}
+
+.attribution-toggle__button {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--navy);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.attribution-toggle__panel {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  width: max-content;
+  max-width: 260px;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--ink);
+  font-size: 0.72rem;
+  line-height: 1.4;
+  padding: 0.5rem 0.65rem;
+  border-radius: 6px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.attribution-toggle.is-open .attribution-toggle__panel {
+  display: block;
+}
+
 /* ---------------------------------------------------------------- mobile */
 
 @media (max-width: 860px) {
@@ -398,7 +436,11 @@ h1, h2 {
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 15;
+    /* Above Leaflet's own controls (z-index: 1000) — without this the
+       floating pill and Leaflet's bottom-left attribution control are in
+       the same stacking context and can render on top of each other
+       depending on DOM order. */
+    z-index: 1200;
     background: var(--fog);
     border-radius: 14px 14px 0 0;
     box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.25);
