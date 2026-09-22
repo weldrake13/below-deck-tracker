@@ -334,6 +334,29 @@ h1, h2 {
   padding: 1rem;
 }
 
+/* Cluster bubbles: grouped yachts that are too close together on screen to
+   show as separate dots at the current zoom. */
+.cluster-icon {
+  background: none;
+  border: none;
+}
+
+.cluster-bubble {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--teal-light);
+  border: 2px solid var(--white);
+  color: var(--white);
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+}
+
 /* Leaflet popups, themed */
 .leaflet-popup-content-wrapper {
   border-radius: 8px;

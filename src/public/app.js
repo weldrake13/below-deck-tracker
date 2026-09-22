@@ -68,6 +68,14 @@
   }
 
   const markersByMmsi = new Map();
+  const markersLayer = L.layerGroup().addTo(map);
+  let currentVisibleYachts = [];
+
+  // Below this many screen pixels apart, yachts are shown as one grouped
+  // bubble rather than overlapping dots — otherwise a marina full of yachts
+  // just looks like a single blob at low zoom. Purely a screen-distance
+  // threshold, so it naturally re-splits as the map zooms in.
+  const CLUSTER_PIXEL_RADIUS = 45;
 
   const showFiltersEl = document.getElementById("show-filters");
   const yachtFiltersEl = document.getElementById("yacht-filters");
@@ -220,42 +228,78 @@
     return `<div class="popup"><h3>${first.showName}</h3>${realBit}${rows}${posBit}</div>`;
   }
 
+  // Greedily groups tracked yachts whose on-screen positions (at the map's
+  // current zoom) fall within CLUSTER_PIXEL_RADIUS of an existing group's
+  // anchor point. Screen distance, not geographic distance, is what makes
+  // this re-group/un-group correctly as the user zooms.
+  function clusterByScreenDistance(boats) {
+    const clusters = [];
+    for (const boat of boats) {
+      const point = map.latLngToContainerPoint([boat.position.latitude, boat.position.longitude]);
+      const cluster = clusters.find((c) => point.distanceTo(c.point) < CLUSTER_PIXEL_RADIUS);
+      if (cluster) cluster.boats.push(boat);
+      else clusters.push({ point, boats: [boat] });
+    }
+    return clusters;
+  }
+
+  function clusterIcon(count) {
+    return L.divIcon({
+      className: "cluster-icon",
+      html: `<div class="cluster-bubble">${count}</div>`,
+      iconSize: [34, 34],
+    });
+  }
+
   function renderMarkers(visible) {
-    const visibleMmsis = new Set();
-    const entriesByMmsi = new Map();
+    currentVisibleYachts = visible;
+    markersLayer.clearLayers();
+    markersByMmsi.clear();
+
+    /** @type {{mmsi: number, position: any, yachts: any[]}[]} */
+    const boats = [];
+    const boatByMmsi = new Map();
     for (const yacht of visible) {
       if (yacht.mmsi === null) continue;
-      if (!positionsByMmsi.has(yacht.mmsi)) continue;
-      visibleMmsis.add(yacht.mmsi);
-      if (!entriesByMmsi.has(yacht.mmsi)) entriesByMmsi.set(yacht.mmsi, []);
-      entriesByMmsi.get(yacht.mmsi).push(yacht);
-    }
-
-    // Remove markers that are no longer visible.
-    for (const [mmsi, marker] of markersByMmsi) {
-      if (!visibleMmsis.has(mmsi)) {
-        map.removeLayer(marker);
-        markersByMmsi.delete(mmsi);
+      const position = positionsByMmsi.get(yacht.mmsi);
+      if (!position) continue;
+      let boat = boatByMmsi.get(yacht.mmsi);
+      if (!boat) {
+        boat = { mmsi: yacht.mmsi, position, yachts: [] };
+        boatByMmsi.set(yacht.mmsi, boat);
+        boats.push(boat);
       }
+      boat.yachts.push(yacht);
     }
 
-    for (const mmsi of visibleMmsis) {
-      const position = positionsByMmsi.get(mmsi);
-      const entries = entriesByMmsi.get(mmsi);
-      let marker = markersByMmsi.get(mmsi);
-      if (!marker) {
-        marker = L.circleMarker([position.latitude, position.longitude], {
+    for (const cluster of clusterByScreenDistance(boats)) {
+      if (cluster.boats.length === 1) {
+        const boat = cluster.boats[0];
+        const marker = L.circleMarker([boat.position.latitude, boat.position.longitude], {
           radius: 7,
           color: "#ffffff",
           weight: 2,
           fillColor: "#1fa3ad",
           fillOpacity: 0.95,
-        }).addTo(map);
-        markersByMmsi.set(mmsi, marker);
-      } else {
-        marker.setLatLng([position.latitude, position.longitude]);
+        }).addTo(markersLayer);
+        marker.bindPopup(popupHtml(boat.yachts));
+        markersByMmsi.set(boat.mmsi, marker);
+        continue;
       }
-      marker.bindPopup(popupHtml(entries));
+
+      const lats = cluster.boats.map((b) => b.position.latitude);
+      const lngs = cluster.boats.map((b) => b.position.longitude);
+      const center = [
+        lats.reduce((a, b) => a + b, 0) / lats.length,
+        lngs.reduce((a, b) => a + b, 0) / lngs.length,
+      ];
+      const marker = L.marker(center, { icon: clusterIcon(cluster.boats.length) }).addTo(markersLayer);
+      marker.on("click", () => {
+        const bounds = L.latLngBounds(
+          cluster.boats.map((b) => [b.position.latitude, b.position.longitude]),
+        );
+        map.fitBounds(bounds, { padding: [60, 60], maxZoom: 14 });
+      });
     }
   }
 
@@ -316,8 +360,16 @@
         li.style.cursor = "pointer";
         li.addEventListener("click", () => {
           const position = positionsByMmsi.get(yacht.mmsi);
-          map.setView([position.latitude, position.longitude], 8);
-          markersByMmsi.get(yacht.mmsi)?.openPopup();
+          map.setView([position.latitude, position.longitude], Math.max(map.getZoom(), 8));
+          // Open a standalone popup rather than relying on the marker for
+          // this mmsi: the yacht may still be inside a cluster bubble at
+          // this zoom (yachts sharing a marina can sit closer together than
+          // the cluster radius resolves even at max zoom), so there may be
+          // no individual marker to open a popup on.
+          L.popup()
+            .setLatLng([position.latitude, position.longitude])
+            .setContent(popupHtml(data.yachts.filter((y) => y.mmsi === yacht.mmsi)))
+            .openOn(map);
         });
       }
 
@@ -330,6 +382,12 @@
     renderMarkers(visible);
     renderList(visible);
   }
+
+  // Clustering is based on screen-pixel distance, which only changes with
+  // zoom (panning shifts every marker by the same offset, so their relative
+  // distances — and thus the clusters — don't change). Re-run it whenever
+  // the zoom settles so clusters split apart as the user zooms in.
+  map.on("zoomend", () => renderMarkers(currentVisibleYachts));
 
   function updateAisStatus() {
     if (!data.aisConfigured) {
