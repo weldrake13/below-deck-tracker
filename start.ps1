@@ -21,7 +21,7 @@ if ($Docker -and $Prod) {
     exit 1
 }
 
-$port = if ($env:HTTP_PORT) { $env:HTTP_PORT } else { '3000' }
+$port = if ($env:HTTP_PORT) { $env:HTTP_PORT } else { '3100' }
 
 if ($Prod) {
     Write-Host "Building the production image and starting on http://localhost:$port"

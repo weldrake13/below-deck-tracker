@@ -3,7 +3,7 @@
   "tasks": [
     {
       "label": "Tracker: run locally (watch)",
-      "detail": "Start the dev server with Node — restarts on save. http://localhost:3000",
+      "detail": "Start the dev server with Node — restarts on save. http://localhost:3100",
       "type": "shell",
       "command": "npm run dev",
       "group": { "kind": "build", "isDefault": true },
@@ -53,7 +53,7 @@
     },
     {
       "label": "Docker: up (dev, watch)",
-      "detail": "Run in Docker with the source mounted and hot reload. http://localhost:3000",
+      "detail": "Run in Docker with the source mounted and hot reload. http://localhost:3100",
       "type": "shell",
       "command": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build",
       "isBackground": true,

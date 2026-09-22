@@ -4,7 +4,8 @@ function num(value: string | undefined, fallback: number): number {
 }
 
 export const config = {
-  port: num(process.env.PORT, 3000),
+  // 3100, not 3000 — this runs on the same box as the jessica-jade site, which owns 3000.
+  port: num(process.env.PORT, 3100),
   isProduction: process.env.NODE_ENV === "production",
 
   /**

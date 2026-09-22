@@ -20,7 +20,7 @@ now if it's broadcasting AIS.
 
 Windows: `.\start.ps1`, `.\start.ps1 -Docker`, `.\start.ps1 -Prod`.
 
-Open <http://localhost:3000>. VS Code: **Run Task** → `Tracker: run locally (watch)`
+Open <http://localhost:3100>. VS Code: **Run Task** → `Tracker: run locally (watch)`
 (`Cmd/Ctrl+Shift+B`).
 
 ### Live tracking (optional, but the whole point)
@@ -86,7 +86,7 @@ flowchart LR
     Repo -->|"git pull (deploy.sh)"| Host["Production host"]
 
     subgraph Host
-        Compose["docker compose"] --> Container["below-deck-tracker container\nNode, port 3000"]
+        Compose["docker compose"] --> Container["below-deck-tracker container\nNode, published on :3100"]
         Container -.->|"bind mount, read-only"| ContentDir["./content"]
     end
 

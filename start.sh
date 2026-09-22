@@ -34,7 +34,7 @@ if [ "$MODE" = "node" ] && [ -f .env ]; then
   set +a
 fi
 
-PORT="${HTTP_PORT:-3000}"
+PORT="${HTTP_PORT:-3100}"
 
 case "$MODE" in
   node)
