@@ -19,7 +19,8 @@ FROM node:26-bookworm-slim AS runtime
 
 ENV NODE_ENV=production \
     PORT=3000 \
-    CONTENT_DIR=/app/content
+    CONTENT_DIR=/app/content \
+    CACHE_DIR=/var/cache/below-deck-tracker
 
 WORKDIR /app
 
@@ -34,7 +35,7 @@ COPY src/public ./src/public
 # so editing content/yachts.json doesn't need a rebuild.
 COPY content ./content
 
-RUN chown -R node:node /app
+RUN mkdir -p "$CACHE_DIR" && chown -R node:node "$CACHE_DIR" /app
 
 USER node
 

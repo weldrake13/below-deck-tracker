@@ -24,3 +24,7 @@ export const PUBLIC_DIR = join(ROOT, "src", "public");
 
 /** The yacht/show data James edits by hand. */
 export const CONTENT_DIR = resolve(process.env.CONTENT_DIR ?? join(ROOT, "content"));
+
+/** Disposable: just the last-saved position snapshot, so a restart isn't a blank map. */
+export const CACHE_DIR = resolve(process.env.CACHE_DIR ?? join(ROOT, ".cache"));
+export const POSITIONS_SNAPSHOT_FILE = join(CACHE_DIR, "positions.json");

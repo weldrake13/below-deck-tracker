@@ -15,6 +15,9 @@ services:
       # Yacht/show data lives outside the image — adding a yacht or fixing a
       # season number just needs `docker compose restart web`, no rebuild.
       - ./content:/app/content:ro
+      # Last-saved positions, so a redeploy doesn't show a blank map for a few
+      # minutes. Written every 5 minutes; capped at one small file, not a log.
+      - position-cache:/var/cache/below-deck-tracker
     healthcheck:
       test:
         - CMD
@@ -25,3 +28,6 @@ services:
       timeout: 5s
       retries: 3
       start_period: 15s
+
+volumes:
+  position-cache:

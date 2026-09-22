@@ -1,5 +1,6 @@
 node_modules/
 dist/
+.cache/
 *.tsbuildinfo
 
 # Local secrets (aisstream.io API key). Copy .env.example to .env instead.

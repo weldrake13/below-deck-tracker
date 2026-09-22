@@ -66,6 +66,7 @@ flowchart LR
     subgraph Node["Node.js / Express — src/server.ts"]
         API["/api/state\n/api/positions"]
         Store[("In-memory position store\n(Map&lt;MMSI, position&gt;)")]
+        Snapshot[("positions.json\n.cache/ — one file, rewritten every 5 min")]
         AISClient["AIS client\nsrc/lib/ais-client.ts"]
         Content["Content loader\nsrc/lib/content.ts"]
     end
@@ -74,6 +75,7 @@ flowchart LR
     Content --> API
     Store --> API
     AISClient -->|"latest position per MMSI"| Store
+    Store <-.->|"save every 5 min + on shutdown\nload once at startup"| Snapshot
     UI <-->|"fetch once, poll /api/positions every 30s"| API
     AISClient <==>|"WebSocket, subscribed by MMSI"| AIS["aisstream.io"]
 ```
@@ -101,6 +103,7 @@ src/
     content.ts           Reads content/yachts.json + shows.json
     ais-client.ts        WebSocket client to aisstream.io — the live bit
     position-store.ts    In-memory latest-position-per-MMSI cache
+    position-snapshot.ts Saves/restores that cache to .cache/positions.json
   routes/
     api.ts               GET /api/state, GET /api/positions
   public/                index.html, styles.css, app.js — no client framework
@@ -156,6 +159,16 @@ hand-drawn map edge.
 matched back to a real, AIS-broadcasting vessel. Those show up in the list with
 "not currently tracked" instead of a guess. See
 [`content/README.md`](content/README.md) if you find one.
+
+**Surviving a restart.** The position store also matters for a second reason: the
+aisstream.io connection is a live stream, not something you can poll on demand, so every
+browser tab shares that one connection instead of opening its own — no way to hit a rate
+limit by having more visitors. The only gap is a restart/redeploy, where the in-memory
+store would otherwise start empty until each vessel next reports in. `position-snapshot.ts`
+covers that: it writes the current positions to `.cache/positions.json` every 5 minutes
+and on shutdown, and reloads it at startup. It's one file, always fully overwritten (never
+appended to), so it can't grow over time — worth knowing if you're tempted to reach for
+Redis here, that's what it'd be replacing for no real benefit at this scale.
 
 ---
 

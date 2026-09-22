@@ -38,10 +38,12 @@ changing the tile URL without checking it's actually broken for the user first.
 
 - **Content is data.** `content/yachts.json` and `content/shows.json` are what the app
   shows — never hardcode a yacht into a template or route.
-- **No database.** Positions live in an in-memory `Map` (`src/lib/position-store.ts`) that
-  refills itself from the AIS feed within a few minutes of a restart. That's an accepted
-  tradeoff for staying stateless — don't "fix" it by adding persistence unless the
-  requirements actually change.
+- **No database.** Positions live in an in-memory `Map` (`src/lib/position-store.ts`).
+  It's snapshotted to one JSON file every 5 minutes and on shutdown
+  (`src/lib/position-snapshot.ts`), purely so a restart isn't a blank map — that file is
+  always fully overwritten, never appended, so it can't grow unbounded. Don't turn this
+  into a real database (Redis, Postgres, etc.) unless the requirements actually change;
+  the snapshot exists to solve "blank map after deploy," nothing more.
 - **No client framework, no build step beyond `tsc`.** Plain `src/public/app.js`, vanilla
   DOM. Keep it that way unless there's a real reason.
 - Leaflet is **self-hosted** in `src/public/vendor/leaflet/` (copied from the npm

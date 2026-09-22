@@ -8,7 +8,12 @@ services:
     environment:
       NODE_ENV: development
       CONTENT_DIR: /app/content
+      CACHE_DIR: /app/.cache
     volumes:
       - ./src:/app/src
       - ./content:/app/content
+      - dev-cache:/app/.cache
     command: ["npm", "run", "dev"]
+
+volumes:
+  dev-cache:
