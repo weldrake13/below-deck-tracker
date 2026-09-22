@@ -48,13 +48,16 @@
     <main class="content">
       <div id="map" class="map" role="application" aria-label="Map of tracked yacht positions"></div>
 
-      <section class="results">
+      <section id="results" class="results is-collapsed">
         <div class="results__heading-row">
           <h2 id="results-count">Yachts</h2>
           <span class="results__legend">
-            <span class="dot dot--live" aria-hidden="true"></span> live position
-            <span class="dot dot--unknown" aria-hidden="true"></span> not currently tracked
+            <span class="dot dot--live" aria-hidden="true"></span><span id="live-count">0 live</span>
+            <span class="dot dot--unknown" aria-hidden="true"></span><span id="untracked-count">0 not tracked</span>
           </span>
+          <button id="results-toggle" class="results__toggle" type="button" aria-expanded="false" aria-controls="yacht-list">
+            Show list
+          </button>
         </div>
         <ul id="yacht-list" class="yacht-list"></ul>
       </section>

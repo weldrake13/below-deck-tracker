@@ -42,10 +42,20 @@
   const aisStatusEl = document.getElementById("ais-status");
   const filtersToggleEl = document.getElementById("filters-toggle");
   const filtersEl = document.getElementById("filters");
+  const resultsEl = document.getElementById("results");
+  const resultsToggleEl = document.getElementById("results-toggle");
+  const liveCountEl = document.getElementById("live-count");
+  const untrackedCountEl = document.getElementById("untracked-count");
 
   filtersToggleEl.addEventListener("click", () => {
     const isOpen = filtersEl.classList.toggle("is-open");
     filtersToggleEl.setAttribute("aria-expanded", String(isOpen));
+  });
+
+  resultsToggleEl.addEventListener("click", () => {
+    const isOpen = !resultsEl.classList.toggle("is-collapsed");
+    resultsToggleEl.setAttribute("aria-expanded", String(isOpen));
+    resultsToggleEl.textContent = isOpen ? "Hide list" : "Show list";
   });
 
   document.querySelectorAll("[data-clear]").forEach((button) => {
@@ -208,6 +218,10 @@
   function renderList(visible) {
     yachtListEl.innerHTML = "";
     resultsCountEl.textContent = `Yachts (${visible.length})`;
+
+    const liveCount = visible.filter((y) => y.mmsi !== null && positionsByMmsi.has(y.mmsi)).length;
+    liveCountEl.textContent = `${liveCount} live`;
+    untrackedCountEl.textContent = `${visible.length - liveCount} not tracked`;
 
     if (visible.length === 0) {
       yachtListEl.innerHTML = '<li class="empty-state">No yachts match the current filters.</li>';

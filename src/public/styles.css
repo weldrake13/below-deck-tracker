@@ -30,6 +30,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 h1, h2 {
@@ -50,6 +51,7 @@ h1, h2 {
   position: sticky;
   top: 0;
   z-index: 20;
+  border-bottom: 2px solid var(--teal-light);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
@@ -211,6 +213,7 @@ h1, h2 {
 
 .map {
   height: 55vh;
+  height: 55dvh;
   min-height: 420px;
   background: var(--navy);
 }
@@ -240,12 +243,24 @@ h1, h2 {
   gap: 0.35rem;
 }
 
+.results__toggle {
+  display: none;
+  background: var(--navy);
+  color: var(--white);
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
 .dot {
   display: inline-block;
   width: 9px;
   height: 9px;
   border-radius: 50%;
   margin-left: 0.6rem;
+  margin-right: 0.3rem;
 }
 
 .dot:first-child {
@@ -362,11 +377,26 @@ h1, h2 {
   }
 
   .map {
-    height: 42vh;
-    min-height: 260px;
+    height: 60vh;
+    height: 60dvh;
+    min-height: 320px;
   }
 
   .yacht-list {
     grid-template-columns: 1fr;
+  }
+
+  .results__toggle {
+    display: inline-block;
+  }
+
+  .results.is-collapsed .yacht-list {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .topbar__tagline {
+    display: none;
   }
 }
