@@ -25,7 +25,7 @@
     "mmsi": 339002000,
     "imo": 9093816,
     "homeWaters": "Caribbean & Bahamas; later chartered out of New England (US East Coast) after a refit; currently Jamaica-flagged",
-    "notes": "Launched 1998 as Roxana, was named Ohana by S2 filming — no fictional alias was used. Sold after filming and renamed Rhino (~2015), then refit and renamed again to Star Diamond (current name). AIS lookups for \"Ohana\"/\"Rhino\" returned multiple unrelated vessels sharing those generic names, but \"Star Diamond\" resolved to a single unambiguous 154ft/1998 Admiral-built yacht matching the specs on file — MMSI/IMO confirmed via MarineTraffic."
+    "notes": "Launched 1998 as Roxana, was named Ohana by S2 filming — no fictional alias was used. Sold after filming and renamed Rhino (~2015), then Lady Guinevere, then refit and renamed again to Star Diamond (current name — confirmed via VesselFinder/MarineTraffic, which both resolve IMO 9093816 to Star Diamond as of this check). AIS lookups for \"Ohana\"/\"Rhino\" returned multiple unrelated vessels sharing those generic names, but \"Star Diamond\" resolved to a single unambiguous 154ft/1998 Admiral-built yacht matching the specs on file — MMSI/IMO confirmed via MarineTraffic."
   },
   {
     "id": "below-deck-s3-eros",
@@ -151,7 +151,7 @@
     "mmsi": 256393000,
     "imo": 8990495,
     "homeWaters": "Mediterranean (Spain/Balearics)",
-    "notes": "Renamed \"The Wellington\" for the show; her real name, The Wellesley, comes from her owner (a hotelier who also owns The Wellesley hotel in Knightsbridge, London)."
+    "notes": "Renamed \"The Wellington\" for the show; her real name, The Wellesley, comes from her owner (a hotelier who also owns The Wellesley hotel in Knightsbridge, London). Sold since filming and renamed Shalawaty (current name) — MMSI/IMO on file are unchanged and still resolve correctly under the new name."
   },
   {
     "id": "below-deck-med-s6-lady-michelle",
@@ -274,10 +274,10 @@
     "vesselType": "motor yacht",
     "lengthFt": 167,
     "builder": "Narasaki Shipbuilding (Japan)",
-    "mmsi": null,
+    "mmsi": 518159000,
     "imo": 7527617,
-    "homeWaters": "Australia/Asia-Pacific (wide-ranging explorer yacht); filmed in the Whitsunday Islands, Australia",
-    "notes": "Converted ice-class research vessel — delivered 1976 as Hokko Maru (\"Northern Light\"), later rebuilt as a private/charter explorer yacht and renamed Northern Sun; real name unchanged for the show. IMO 7527617 is well-confirmed; MMSI was reported inconsistently across trackers (312000031 vs 518159000 in different snapshots) so left null rather than pick one with confidence."
+    "homeWaters": "Southeast Asia (currently Cook Islands-flagged, based out of Phuket, Thailand); filmed in the Whitsunday Islands, Australia",
+    "notes": "Converted ice-class research vessel — delivered 1976 as Hokko Maru (\"Northern Light\"), later rebuilt as a private/charter explorer yacht and renamed Northern Sun; real name unchanged for the show. IMO 7527617 is well-confirmed. MMSI was previously reported inconsistently across trackers (312000031 vs 518159000) so was left null; re-checked against MarineTraffic, VesselFinder and shipfix.com, which now consistently agree on MMSI 518159000 under a Cook Islands flag (call sign E5U2110) — the 312000031 reading appears to have been a stale/mismatched snapshot."
   },
   {
     "id": "below-deck-down-under-s3-4-katina",
