@@ -160,6 +160,21 @@ matched back to a real, AIS-broadcasting vessel. Those show up in the list with
 "not currently tracked" instead of a guess. See
 [`content/README.md`](content/README.md) if you find one.
 
+Separately — and this trips people up more — a yacht **with a correct, verified MMSI**
+can still sit as "not currently tracked" most of the time. That's expected, not a bug:
+aisstream.io's free tier is a crowdsourced network of **terrestrial VHF receivers**
+(volunteers running antennas on land), not satellite AIS. AIS is line-of-sight VHF, so a
+receiver only hears a vessel roughly 20–40nm away. A live probe against production (22
+tracked MMSIs, correct and MarineTraffic-verified) heard from only 4–9 of them in any
+given 8–15 minute window — the rest were simply out of range of a volunteer receiver at
+that moment, disproportionately the yachts currently in the Caribbean, Southeast Asia, or
+other areas with thin receiver coverage. MarineTraffic/VesselFinder resolving the same
+MMSI just fine isn't a contradiction: those blend dozens of terrestrial networks plus
+commercial satellite AIS partnerships, which a single free terrestrial feed structurally
+can't match. Getting the same coverage here would mean paying for a satellite-inclusive
+AIS API (e.g. Spire Maritime, MarineTraffic API, VesselFinder API) as a fallback — a real
+cost/complexity trade a hobby project doesn't currently make.
+
 **Debugging "why isn't yacht X showing up".** Open `/api/debug` in a browser — it's plain
 JSON, no login needed, nothing secret in it (the API key itself is never included). It
 shows the AIS connection's own state (connected/reconnecting, last error, how many raw
@@ -167,7 +182,7 @@ messages have come in at all), whether the position snapshot restored on startup
 per MMSI, whether it's currently reporting or not. If `ais.connectionState` is
 `"connected"` and `messagesReceived` is climbing but a specific MMSI is still in
 `notReporting`, that vessel just isn't within range of one of aisstream.io's (terrestrial,
-not satellite) receivers right now, or its transponder is off — not a bug. If
+not satellite) receivers right now, or its transponder is off — not a bug, see above. If
 `messagesReceived` stays near zero, that points at the subscription itself (wrong/expired
 key) rather than vessel coverage.
 
