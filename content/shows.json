@@ -1,0 +1,37 @@
+[
+  {
+    "slug": "below-deck",
+    "name": "Below Deck",
+    "shortName": "BD",
+    "premiered": 2013,
+    "colour": "#2f6690"
+  },
+  {
+    "slug": "below-deck-med",
+    "name": "Below Deck Mediterranean",
+    "shortName": "BD Med",
+    "premiered": 2016,
+    "colour": "#1fa3ad"
+  },
+  {
+    "slug": "below-deck-sailing-yacht",
+    "name": "Below Deck Sailing Yacht",
+    "shortName": "BD Sailing",
+    "premiered": 2020,
+    "colour": "#6b8f3e"
+  },
+  {
+    "slug": "below-deck-down-under",
+    "name": "Below Deck Down Under",
+    "shortName": "BD Down Under",
+    "premiered": 2022,
+    "colour": "#c9772f"
+  },
+  {
+    "slug": "below-deck-adventure",
+    "name": "Below Deck Adventure",
+    "shortName": "BD Adventure",
+    "premiered": 2024,
+    "colour": "#7a5ea8"
+  }
+]

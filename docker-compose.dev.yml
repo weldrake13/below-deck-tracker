@@ -1,0 +1,14 @@
+# Development overlay: source is mounted from the host and the server restarts
+# on save. Use via `./start.sh --docker`, or:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+services:
+  web:
+    build:
+      target: build
+    environment:
+      NODE_ENV: development
+      CONTENT_DIR: /app/content
+    volumes:
+      - ./src:/app/src
+      - ./content:/app/content
+    command: ["npm", "run", "dev"]
