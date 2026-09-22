@@ -14,6 +14,9 @@
   const selectedYachtIds = new Set();
 
   const map = L.map("map", { worldCopyJump: true }).setView([25, -40], 3);
+  // Default is bottom-right, which on mobile collides with the floating
+  // "show list" button that overlays the bottom of the full-screen map.
+  map.attributionControl.setPosition("bottomleft");
 
   // Esri's free Ocean basemap gives an actual nautical-chart look (bathymetry,
   // depth soundings) with no API key. If it's ever unreachable, OpenStreetMap
@@ -47,15 +50,24 @@
   const liveCountEl = document.getElementById("live-count");
   const untrackedCountEl = document.getElementById("untracked-count");
 
+  let lastVisibleCount = 0;
+
   filtersToggleEl.addEventListener("click", () => {
     const isOpen = filtersEl.classList.toggle("is-open");
     filtersToggleEl.setAttribute("aria-expanded", String(isOpen));
   });
 
-  resultsToggleEl.addEventListener("click", () => {
-    const isOpen = !resultsEl.classList.toggle("is-collapsed");
+  function updateResultsToggleLabel() {
+    const isOpen = !resultsEl.classList.contains("is-collapsed");
     resultsToggleEl.setAttribute("aria-expanded", String(isOpen));
-    resultsToggleEl.textContent = isOpen ? "Hide list" : "Show list";
+    resultsToggleEl.textContent = isOpen
+      ? "✕ Hide list"
+      : `☰ ${lastVisibleCount} yacht${lastVisibleCount === 1 ? "" : "s"}`;
+  }
+
+  resultsToggleEl.addEventListener("click", () => {
+    resultsEl.classList.toggle("is-collapsed");
+    updateResultsToggleLabel();
   });
 
   document.querySelectorAll("[data-clear]").forEach((button) => {
@@ -222,6 +234,9 @@
     const liveCount = visible.filter((y) => y.mmsi !== null && positionsByMmsi.has(y.mmsi)).length;
     liveCountEl.textContent = `${liveCount} live`;
     untrackedCountEl.textContent = `${visible.length - liveCount} not tracked`;
+
+    lastVisibleCount = visible.length;
+    updateResultsToggleLabel();
 
     if (visible.length === 0) {
       yachtListEl.innerHTML = '<li class="empty-state">No yachts match the current filters.</li>';
