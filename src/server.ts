@@ -26,9 +26,12 @@ app.get("/healthz", (_req, res) => {
 });
 
 app.use(
-  express.static(PUBLIC_DIR, {
-    maxAge: config.isProduction ? "1d" : 0,
-  }),
+  // maxAge: 0 (not a longer production value) is deliberate — app.js/styles.css/index.html
+  // have no cache-busting hash in their URLs, so a longer max-age means browsers that
+  // visited before a deploy keep serving stale JS/CSS for that whole window, silently
+  // out of sync with the new HTML. Express still sends ETag/Last-Modified, so repeat
+  // visits are a cheap conditional GET (304), not a full re-download.
+  express.static(PUBLIC_DIR, { maxAge: 0 }),
 );
 
 app.use((_req, res) => {
