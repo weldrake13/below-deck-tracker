@@ -15,12 +15,12 @@
   },
   "dependencies": {
     "express": "^5.2.1",
-    "ws": "^8.19.0"
+    "ws": "^8.22.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
-    "@types/node": "^26.1.2",
-    "@types/ws": "^8.5.13",
+    "@types/node": "^26.6.4",
+    "@types/ws": "^8.18.2",
     "tsx": "^4.23.10",
     "typescript": "^7.0.2"
   }
